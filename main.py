@@ -1,6 +1,7 @@
+import email
 import uvicorn
-from fastapi import FastAPI
-from modules.model import PostSchema
+from fastapi import FastAPI, HTTPException
+from modules.model import PostSchema, UserLogInSchema, UserSignUpSchema
 
 posts = [
     {
@@ -21,7 +22,14 @@ posts = [
     }
 ]
 
-user = []
+users = [
+
+    {
+        "name": "Admin",
+        "email": "admin@admin.com",
+        "password": "oui",
+    }
+]
 
 app = FastAPI()
 
@@ -31,7 +39,7 @@ def greet():
     return {"Hello":"World!"}
 
 #2 Get all posts
-@app.get("/posts", tags=["all posts!! 🔥"])
+@app.post("/posts1", tags=["all posts!! 🔥"])
 def get_posts():
     return {"data" : posts}
 
@@ -56,5 +64,28 @@ def add_post(post : PostSchema):
     return {
         "info":"Post added!"
     }
+
+#5 User sign up
+@app.post("/user/signup", tags = ["user sign up 🏄"])
+def userSignUp(post : UserSignUpSchema):
+    users.append(post.dict())
+    return {
+        "info": "user login created!"
+    }
+
+#6 Get all user posts
+@app.get("/user/get all posts", tags=["all user posts!! 🔥🔥🔥"])
+def get_all_user_posts():
+    return {"data" : users}
+
+
+#7 User log in
+@app.post("/user/login", tags=["user login 🐄"])
+def user_sign_in(data: UserLogInSchema):
+
+    for user in users:
+            if user["email"] == data.email and user["password"] == data.password:
+                return {"message" : "You are logged in!"}
+    raise HTTPException(status_code=404, detail="Incorrect email")
 
 
